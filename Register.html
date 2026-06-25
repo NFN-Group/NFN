@@ -349,7 +349,9 @@
             <div class="remember-me-box" id="rememberCheck"></div>
             Remember Me    
           </div>    
-          <div class="forgot-password"><a href="https://wa.me/2349070689879?text=Hello,%20I%20would%20like%20to%20respectfully%20request%20assistance%20with%20resetting%20my%20NFN%20Groups%20Login%20password" target="_blank">Forgot Password?</a></div>    
+          <div class="forgot-password">
+  <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+</div>
         </div>    
         <button type="submit" class="btn login-btn">Login</button>  
         <!-- Fingerprint Login Button (Hidden Until Email Entered) -->
@@ -680,6 +682,33 @@ if (storedRef) {
 }
     document.getElementById("regGuideLink").addEventListener("click", () => {
     window.location.href = "Registration User Guide Manual .html";
+});
+document.getElementById("forgotPasswordLink").addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+
+    if (!email) {
+        showMsg("Please enter your email first");
+        return;
+    }
+
+    try {
+        await firebase.auth().sendPasswordResetEmail(email);
+
+        // ⚠️ Always show success message (Firebase security design)
+        showMsg("If this email exists, a reset link has been sent.", true);
+
+    } catch (error) {
+
+        console.log(error);
+
+        if (error.code === "auth/invalid-email") {
+            showMsg("Invalid email format");
+        } else {
+            showMsg("Network error. Try again");
+        }
+    }
 });
 </script>
 </body>    
