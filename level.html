@@ -130,7 +130,7 @@ body{
 
 .swipe-level {
   background: rgba(255,255,255,0.95);
-  padding: 40px;
+  padding: 80px 40px 40px;
   border-radius: 25px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   text-align: center;
@@ -143,7 +143,8 @@ body{
   width: 120px;
   height: 120px;
   object-fit: contain;
-  margin-bottom: 20px;
+  margin: 0 auto 20px auto;
+  display: block;
 }
 
 .swipe-level h2 {
@@ -247,19 +248,19 @@ body{
 }
 
   .level-back-header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:14px 16px;
-  background:#eef6ff;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 9999;
 }
 
 .level-back-header i{
-  font-size:30px;
-  font-weight:900;
+  font-size:28px;
+  color:#000;
+  background:#fff;
+  padding:7px 12px;
+  border-radius:50%;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
   cursor:pointer;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
@@ -319,17 +320,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <body>
 
   <!-- Back Header -->
+<div class="level-back-header">
+  <i class="fa-solid fa-chevron-left" id="levelBack"></i>
+</div>
+  
+<!-- ORIGINAL TABLE CODE -->
 <div class="header">
-  <i class="fa-solid fa-chevron-left" id="levelBack"
-     style="
-       position:absolute;
-       left:20px;
-       top:20px;
-       font-size:30px;
-       cursor:pointer;
-     ">
-  </i>
-
   <h1>NFN</h1>
   <p>Employee Level Income Details (NGN)</p>
 </div>
@@ -487,7 +483,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 // LEVEL DATA WITH TEMPORARY FIRST AND IMAGES
 const levels = [
   {name:"Temporary", margin:"—", daily:"600", tasks:"5", commission:"120", monthly:"—", annual:"—", note:"Temporary level is perfect for beginners to familiarize themselves with basic tasks and workflow. It provides minimal commitment with a hands-on introduction to daily responsibilities and task handling.", image:"https://img.icons8.com/color/96/000000/blue-circle.png"},
-  {name:"Level 1", margin:"18,000", daily:"600", tasks:"5", commission:"120", monthly:"18,000", annual:"216,000", note:"Level 1 is ideal for newcomers who want to understand the fundamentals of the workflow. It offers a consistent income stream while allowing users to learn task management, basic commissions, and daily operational responsibilities. This level is foundational for professional growth and financial discipline.", image:"https://img.icons8.com/color/96/000000/silver-medal.png"},
+  {name:"Level 1", margin:"18,000", daily:"600", tasks:"5", commission:"120", monthly:"18,000", annual:"216,000", note:"Level 1 is ideal for newcomers who want to understand the fundamentals of the workflow. It offers a consistent income stream while allowing users to learn task management, basic commissions, and daily operational responsibilities. This level is foundational for professional growth and financial discipline.", image:"bronze1.png"},
   {name:"Level 2", margin:"50,400", daily:"1,680", tasks:"10", commission:"168", monthly:"50,400", annual:"604,800", note:"Level 2 is designed for employees who have grasped the basics and are ready to expand their efficiency. The increased margin rate and task volume develop analytical and strategic skills. This level fosters a professional approach to time management, productivity, and client engagement.", image:"https://img.icons8.com/color/96/000000/bronze-medal.png"},
   {name:"Level 3", margin:"151,200", daily:"5,040", tasks:"20", commission:"252", monthly:"151,200", annual:"1,814,400", note:"At Level 3, the focus is on scaling operations, improving task accuracy, and maximizing income potential. Professionals at this stage are expected to take initiative, contribute innovative solutions, and enhance their strategic decision-making skills, preparing for managerial responsibilities.", image:"https://img.icons8.com/color/96/000000/gold-medal.png"},
   {name:"Level 4", margin:"448,000", daily:"16,000", tasks:"50", commission:"320", monthly:"480,000", annual:"5,840,000", note:"Level 4 provides advanced earning opportunities while emphasizing leadership, project oversight, and team collaboration. Employees are expected to mentor others, optimize workflow, and demonstrate significant business acumen. This level prepares individuals for senior and executive-level roles.", image:"https://img.icons8.com/color/96/000000/diamond.png"},
