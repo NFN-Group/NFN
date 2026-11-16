@@ -467,41 +467,92 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
   if(captchaInput.value !== actualCaptcha){ highlightInput(captchaInput,true); showMsg("Incorrect verification code"); generateCaptchaCode(); return; }    
 
   auth.createUserWithEmailAndPassword(email.value, password.value)    
-    .then((userCredential) => {    
+    .then(async (userCredential) => {
       const user = userCredential.user;    
       user.sendEmailVerification().then(()=>{    
         showMsg("Registration successful! Verification email sent.", true);    
       }).catch((err)=>{    
         showMsg("Error sending verification: " + err.message);    
       });    
-    // Create referral code from email name + random numbers
-const emailName = email.value.split("@")[0]; // josephblessing123
-const shortName = emailName.replace(/[^a-zA-Z]/g, "").substring(0, 6) || "User";
-const referralCode = shortName.toUpperCase() + Math.floor(1000 + Math.random() * 9000);
-// Example: JOSEPH4821  
+    
+// GET REFERRAL CODE
+const referredBy = (
+    localStorage.getItem("referredBy") || ""
+).trim().toUpperCase();
 
-db.collection("users").doc(user.uid).set({      
-  email: email.value,      
-  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  referralCode: referralCode, // Unique code for this user
-  referredBy: localStorage.getItem("referredBy") || null // Track who referred this user
-});
-      const referredBy = localStorage.getItem("referredBy");
+try {
 
-if (referredBy) {
-  // Add this user UID to the referrer's document
-  db.collection("users").where("referralCode", "==", referredBy).get()
-    .then(snapshot => {
-      snapshot.forEach(doc => {
-        db.collection("users").doc(doc.id).update({
-          referrals: firebase.firestore.FieldValue.arrayUnion(user.uid)
-        });
-      });
+    let referrerDoc = null;
+
+    // CHECK WHO REFERRED THIS USER
+    if (referredBy) {
+
+        const snapshot = await db.collection("users")
+            .where("referralCode", "==", referredBy)
+            .get();
+
+        if (snapshot.empty) {
+            showMsg("Invalid referral code");
+            return;
+        }
+
+        referrerDoc = snapshot.docs[0];
+    }
+
+    // GENERATE NEW USER REFERRAL CODE
+    const emailName = email.value.split("@")[0];
+
+    const shortName = emailName
+        .replace(/[^a-zA-Z]/g, "")
+        .substring(0, 6) || "User";
+
+    const newReferralCode =
+        shortName.toUpperCase() +
+        Math.floor(1000 + Math.random() * 9000);
+
+    // SAVE NEW USER
+    await db.collection("users").doc(user.uid).set({
+
+        email: email.value,
+
+        createdAt:
+            firebase.firestore.FieldValue.serverTimestamp(),
+
+        referralCode: newReferralCode,
+
+        referredBy: referredBy || null,
+
+        referrals: []
+
     });
 
-  // Remove referral from local storage
-  localStorage.removeItem("referredBy");
+    // ADD NEW USER TO REFERRER'S TEAM
+    if (referrerDoc) {
+
+        await db.collection("users")
+            .doc(referrerDoc.id)
+            .update({
+
+                referrals:
+                    firebase.firestore.FieldValue
+                    .arrayUnion(user.uid)
+
+            });
+    }
+
+    // CLEAR REFERRAL AFTER SUCCESSFUL SAVING
+    localStorage.removeItem("referredBy");
+
+    showMsg("Referral registration saved!", true);
+
+} catch (error) {
+
+    console.error("Referral registration error:", error);
+
+    showMsg("Could not save referral information");
+
 }
+
       highlightInput(email,false,true); highlightInput(password,false,true); highlightInput(confirmPassword,false,true);    
     })    
     .catch((error) => {    
@@ -622,7 +673,7 @@ localStorage.setItem('userProfile', JSON.stringify({
     }
 
     auth.signInWithEmailAndPassword(email, password)
-.then((userCredential) => {
+.then(async (userCredential) => {
 
     const user = userCredential.user;
 
@@ -660,19 +711,17 @@ localStorage.setItem('userProfile', JSON.stringify({
 });
 </script>
     <script>
-const params = new URLSearchParams(window.location.search);
-const referrer = params.get('ref');
-
-if (referrer) {
-  localStorage.setItem('referredBy', referrer);
-}
-    // Check if user arrived with a referral link
+// CAPTURE REFERRAL CODE
 const urlParams = new URLSearchParams(window.location.search);
-const ref = urlParams.get("ref");
+const referralCode = urlParams.get("ref");
 
-// Only store if no referral is stored yet
-if (ref && !localStorage.getItem("referredBy")) {
-  localStorage.setItem("referredBy", ref);
+if (referralCode) {
+    localStorage.setItem(
+        "referredBy",
+        referralCode.trim().toUpperCase()
+    );
+
+    console.log("Referral code captured:", referralCode);
 }
 
 // Optional: test in console
